@@ -1,6 +1,10 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>NLP - Emotion Detection</title>
     <script src="./static/mywebscript.js"></script>
     <style>
         .center-heading {
@@ -12,21 +16,49 @@
     <div class="card">
         <div class="card-body">
             <h1 class="center-heading">NLP - Emotion Detection</h1> 
-            <div style="padding: 25px 25px 25px 25px;">
-            <h2 class="mb-3">
-                <label class="form-label">Please enter the text to be analyzed</label>
-                <input type="textarea" class="form-control" id="textToAnalyze">
-            </h2>
+            <div style="padding: 25px;">
+                <h2 class="mb-3">
+                    <label class="form-label">Please enter the text to be analyzed:</label>
+                    <input type="text" class="form-control" id="textToAnalyze" placeholder="Enter text here" required>
+                </h2>
 
-            <div style="padding: 25px 25px 25px 25px;">
-                <button onclick="RunSentimentAnalysis()" class="btn btn-secondary">Run Sentiment Analysis</button>
+                <div style="padding: 25px;">
+                    <button onclick="runSentimentAnalysis()" class="btn btn-secondary">Run Sentiment Analysis</button>
+                </div>
+                <div id="error-message" style="color: red;"></div> <!-- Error message display -->
+                <h2 class="mb-3">
+                    <label class="form-label">Result of Emotion Detection</label>
+                </h2>
+                <div id="system_response" style="padding: 25px;"></div>
             </div>
-            <div style="padding: 25px 25px 25px 25px;"></div>
-            <h2 class="mb-3">
-                <label class="form-label">Result of Emotion Detection</label>
-            </h2>
-
-            <div id="system_response" style="padding: 25px 25px 25px 25px;"></div>
         </div>
     </div>
+
+    <script>
+        function runSentimentAnalysis() {
+            const textToAnalyze = document.getElementById('textToAnalyze').value;
+
+            // Clear previous messages
+            document.getElementById('system_response').innerText = '';
+            document.getElementById('error-message').innerText = '';
+
+            fetch(`/emotionDetector?textToAnalyze=${encodeURIComponent(textToAnalyze)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        // If response status not OK, throw error with message
+                        return response.json().then(err => {
+                            throw new Error(err.message);
+                        });
+                    }
+                    return response.text(); // Assuming success returns text
+                })
+                .then(data => {
+                    document.getElementById('system_response').innerText = data; // Display result
+                })
+                .catch(error => {
+                    document.getElementById('error-message').innerText = error.message; // Show error message
+                });
+        }
+    </script>
 </body>
+</html>
